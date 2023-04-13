@@ -1,16 +1,32 @@
 package main
 
 import (
-	"fmt"
+	"log"
 	"net/http"
+
+	"github.com/andersonnfreire/api-climate/pkg/config"
+	"github.com/andersonnfreire/api-climate/pkg/routes"
 )
 
 func main() {
-	// Registra um handler para a rota "/"
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprint(w, "Bem-vindo ao meu servidor local!")
-	})
+	cfg, err := config.Load()
+	if err != nil {
+		log.Fatalf("Erro ao carregar configuração: %v", err)
+	}
 
-	// Inicia o servidor na porta 8080
-	http.ListenAndServe(":8080", nil)
+	server := cfg.Server()
+
+	// Cria o ServeMux e adiciona as rotas
+	mux := http.NewServeMux()
+	routes.AddRoutes(mux)
+
+	// Define o handler do servidor como o ServeMux
+	server.Handler = mux
+
+	log.Printf("Servidor iniciado em http://%s", cfg.ServerAddress())
+
+	err = server.ListenAndServe()
+	if err != nil {
+		log.Fatalf("Erro ao iniciar servidor: %v", err)
+	}
 }
