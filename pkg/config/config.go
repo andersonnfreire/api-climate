@@ -22,12 +22,12 @@ func Load() (*Config, error) {
 
 	host := os.Getenv("HOST")
 	if host == "" {
-		host = "localhost"
+		host = "0.0.0.0"
 	}
 
 	port := os.Getenv("PORT")
 	if port == "" {
-		port = "8080"
+		port = "9000"
 	}
 
 	return &Config{
