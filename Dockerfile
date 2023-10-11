@@ -8,6 +8,6 @@ RUN go mod tidy && go mod vendor
 
 RUN go build ./cmd/main.go
 
-EXPOSE 9000
+EXPOSE 8080
 
 CMD ["./main"]
