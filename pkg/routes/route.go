@@ -3,10 +3,9 @@ package routes
 import (
 	"net/http"
 
-	"github.com/andersonnfreire/api-climate/pkg/controllers"
+	"github.com/andersonnfreire/api-climate/pkg/handlers/prevision"
 )
 
 func AddRoutes(mux *http.ServeMux) {
-	mux.HandleFunc("/", controllers.IndexHandler)
-	mux.HandleFunc("/about", controllers.AboutHandler)
+	mux.HandleFunc("/", prevision.GetPrevisionHandler)
 }
