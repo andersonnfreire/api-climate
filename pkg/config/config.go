@@ -10,8 +10,9 @@ import (
 )
 
 type Config struct {
-	Host string
-	Port string
+	Host           string
+	Port           string
+	UrlOpenWeather string
 }
 
 func Load() (*Config, error) {
@@ -30,9 +31,15 @@ func Load() (*Config, error) {
 		port = "8080"
 	}
 
+	url := os.Getenv("URL_OPEN_WEATHER")
+	if url == "" {
+		url = "http://api.openweathermap.org/data/2.5/weather"
+	}
+
 	return &Config{
-		Host: host,
-		Port: port,
+		Host:           host,
+		Port:           port,
+		UrlOpenWeather: url,
 	}, nil
 }
 
