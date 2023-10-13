@@ -18,7 +18,7 @@ func main() {
 
 	// Cria o ServeMux e adiciona as rotas
 	mux := http.NewServeMux()
-	routes.AddRoutes(mux)
+	routes.AddRoutes(mux, *cfg)
 
 	// Define o handler do servidor como o ServeMux
 	server.Handler = mux
