@@ -1,21 +1,25 @@
 package validation
 
 import (
-	"errors"
 	"net/http"
+
+	"github.com/go-playground/validator"
 )
 
-func ValidateQueryParam(r *http.Request) error {
-	apiKey := r.URL.Query().Get("token")
-	city := r.URL.Query().Get("cidade")
+var validate = validator.New()
 
-	if city == "" {
-		return errors.New("o parâmetro 'cidade' é obrigatório")
+type ParamsGetPrevision struct {
+	Token  string `validate:"required"`
+	Cidade string `validate:"required"`
+}
+
+func ValidateQueryParamGetPrevision(r *http.Request) (ParamsGetPrevision, error) {
+	params := ParamsGetPrevision{
+		Token:  r.URL.Query().Get("token"),
+		Cidade: r.URL.Query().Get("cidade"),
 	}
-
-	if apiKey == "" {
-		return errors.New("o parâmetro 'token' é obrigatório")
+	if err := validate.Struct(params); err != nil {
+		return ParamsGetPrevision{}, err
 	}
-
-	return nil
+	return params, nil
 }
