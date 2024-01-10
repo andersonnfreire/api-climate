@@ -1,6 +1,8 @@
 package prevision
 
 import (
+	"encoding/json"
+	"fmt"
 	"net/http"
 
 	"github.com/andersonnfreire/api-climate/pkg/apis"
@@ -8,15 +10,21 @@ import (
 	"github.com/andersonnfreire/api-climate/pkg/handlers/validation"
 )
 
-func GetPrevision(writerResponse http.ResponseWriter, request *http.Request, cfg config.Config) (apis.HTTPResponse, error) {
+func GetPrevisionHandler(writerResponse http.ResponseWriter, request *http.Request, cfg config.Config) (*WeatherForecastsResponse, error) {
 	params, err := validation.ValidateQueryParamGetPrevision(request)
 	if err != nil {
-		return apis.HTTPResponse{}, err
+		return nil, err
 	}
 
 	apiResponse, err := apis.GetWeatherData(request, params)
 	if err != nil {
-		return apiResponse, err
+		return nil, err
 	}
-	return apiResponse, nil
+
+	var weatherData *WeatherForecastsResponse
+	if err := json.Unmarshal(apiResponse.Body, &weatherData); err != nil {
+		return nil, fmt.Errorf("erro ao decodificar dados da API: %s", err.Error())
+	}
+
+	return weatherData, nil
 }
