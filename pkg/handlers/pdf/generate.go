@@ -2,6 +2,7 @@ package pdf
 
 import (
 	"github.com/andersonnfreire/api-climate/pkg/handlers/prevision"
+	"github.com/andersonnfreire/api-climate/pkg/utils"
 	"github.com/jung-kurt/gofpdf"
 )
 
@@ -17,50 +18,49 @@ func GeneratePDF(weatherData *prevision.WeatherForecastsResponse) (*gofpdf.Fpdf,
 	pdf.SetFont("Arial", "", 12)
 
 	// Adicionar título
-	pdf.Cell(0, 10, "PREVISÃO DO TEMPO")
-	pdf.Ln(35) // Adicionar espaçamento após o título
+	addTitle(pdf, utils.Utf8ToIso("PREVISÃO DO TEMPO"))
 
 	// Coordenadas iniciais para a imagem
-	_, y, _, _ := pdf.GetMargins()
-
-	// Obter largura e altura da página
-	pageWidth, _ := pdf.GetPageSize()
-
-	// Calcular a largura da imagem
-	imageWidth := 40.0 // Substitua pela largura real da sua imagem
-
-	// Calcular a posição x para centralizar a imagem
-	_ = (pageWidth - float64(imageWidth)) / 2
+	x, _, _, _ := pdf.GetMargins()
 
 	// Adicionar imagem
-	imagePath := "imagem.png" // Substitua pelo caminho da sua imagem
-	imageOptions := gofpdf.ImageOptions{ImageType: "PNG"}
-	pdf.ImageOptions(imagePath, 30, y, imageWidth, 0, false, imageOptions, 0, "")
+	addImage(pdf, "imagem.png", x, 15, 40, 40)
 
-	// Dados da cidade
-	data := [][]string{
-		{"Cidade", "Vitoria"},
-		{"Latitude", "-10"},
-		{"Longitude", "-710"},
-		{"Céu", "Nublado"},
-		{"Precipitação", "Chuvisco"},
-		{"Vento", "Fraco a Moderado"},
-		{"Temp: Máx", "31º"},
-		{"Temp: Min", "26º"},
+	cityValues, err := ConvertValuesResponseAPIWeather(weatherData)
+	if err != nil {
+		return nil, err
 	}
 
 	// Adicionar a tabela ao PDF
-	for _, row := range data {
-		AddRow(pdf, row...)
+	for _, label := range cityLabels {
+		addRow(pdf, utils.Utf8ToIso(label), GetCityValueByLabel(cityValues, label))
 	}
 
 	return pdf, nil
 }
 
-// Adicionar uma linha de dados à tabela
-func AddRow(pdf *gofpdf.Fpdf, values ...string) {
-	for _, value := range values {
-		pdf.CellFormat(40, 10, value, "1", 0, "L", false, 0, "")
+// addTitle adiciona um título ao PDF com espaçamento após o título
+func addTitle(pdf *gofpdf.Fpdf, title string) {
+	pdf.Cell(0, 10, title)
+	pdf.Ln(40)
+}
+
+// addImage adiciona uma imagem ao PDF
+func addImage(pdf *gofpdf.Fpdf, imagePath string, x, y, width, height float64) {
+	imageOptions := gofpdf.ImageOptions{ImageType: "PNG"}
+	pdf.ImageOptions(imagePath, x, y, width, height, false, imageOptions, 0, "")
+}
+
+// addRow adiciona uma linha de dados à tabela
+func addRow(pdf *gofpdf.Fpdf, values ...string) {
+	columnWidth := 40.0
+	for i, value := range values {
+		// Usar CellFormat para centralizar somente os valores, não os rótulos
+		align := "L" // Por padrão, alinhar à esquerda para rótulos
+		if i%2 == 1 {
+			align = "C" // Centralizar os valores (índice ímpar)
+		}
+		pdf.CellFormat(columnWidth, 10, value, "1", 0, align, false, 0, "")
 	}
 	pdf.Ln(10)
 }
