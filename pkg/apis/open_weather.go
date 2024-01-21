@@ -12,7 +12,7 @@ func GetWeatherData(request *http.Request, params validation.ParamsGetPrevision)
 	options := HTTPRequestOptions{
 		Method: http.MethodGet,
 		URL:    "http://api.openweathermap.org/data/2.5/weather",
-		Headers: map[string]string{
+		QueryParams: map[string]string{
 			"q":     params.Cidade,
 			"appid": params.Token,
 		},
@@ -24,8 +24,5 @@ func GetWeatherData(request *http.Request, params validation.ParamsGetPrevision)
 		return HTTPResponse{}, err
 	}
 
-	return HTTPResponse{
-		StatusCode: response.StatusCode,
-		Body:       response.Body,
-	}, nil
+	return response, nil
 }

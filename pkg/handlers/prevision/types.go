@@ -8,6 +8,7 @@ type WeatherForecastsResponse struct {
 	InfoClouds          InfoClouds  `json:"clouds"`
 	TimeDataCalculation int         `json:"dt"`
 	Sys                 InfoCountry `json:"sys"`
+	Name                string      `json:"name"`
 	Timezone            int         `json:"timezone"`
 }
 
@@ -16,7 +17,7 @@ type Coordinates struct {
 	Lat float64 `json:"lat"`
 }
 
-type Weather []struct {
+type Weather struct {
 	ID          int64  `json:"id"`
 	Main        string `json:"main"`
 	Description string `json:"description"`
