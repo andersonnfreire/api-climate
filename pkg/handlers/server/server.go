@@ -20,7 +20,7 @@ func APIHandler(writeResponse http.ResponseWriter, request *http.Request, cfg co
 	}
 
 	// Gere o PDF com base nos dados da previsão do tempo.
-	pdf, err := pdf.GeneratePDF(weatherData)
+	pdf, err := pdf.GeneratePDFHandler(weatherData)
 	if err != nil {
 		apis.ResponseWithError(writeResponse, http.StatusInternalServerError, fmt.Sprintf("Erro ao gerar o PDF: %s", err.Error()))
 		return
@@ -29,7 +29,7 @@ func APIHandler(writeResponse http.ResponseWriter, request *http.Request, cfg co
 	// Configura o cabeçalho e envia o PDF como resposta
 	writeResponse.Header().Set("Content-Type", "application/pdf")
 	if err := pdf.Output(writeResponse); err != nil {
-		http.Error(writeResponse, "Erro ao enviar o PDF", http.StatusInternalServerError)
+		apis.ResponseWithError(writeResponse, http.StatusInternalServerError, fmt.Sprintf("Erro ao enviar o PDF: %s", err.Error()))
 		return
 	}
 	apis.Response(writeResponse, http.StatusOK, []byte("PDF gerado com sucesso!"))

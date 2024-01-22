@@ -1,7 +1,6 @@
 package pdf
 
 import (
-	"errors"
 	"fmt"
 
 	"github.com/andersonnfreire/api-climate/pkg/handlers/prevision"
@@ -55,12 +54,7 @@ var CityValuesMap = map[string]func(*CityValues) string{
 	"Temp: Min":    func(c *CityValues) string { return c.TempMin },
 }
 
-func ConvertValuesResponseAPIWeather(weatherData *prevision.WeatherForecastsResponse) (*CityValues, error) {
-
-	if len(weatherData.ClimaticWeather) == 0 {
-		return nil, errors.New("não existe condição climática para esta cidade")
-	}
-
+func ConvertValuesResponseAPIWeather(weatherData *prevision.WeatherForecastsResponse) *CityValues {
 	return &CityValues{
 		City:      weatherData.Name,
 		Latitude:  fmt.Sprintf("%.2f", weatherData.Coordinates.Lat),
@@ -75,7 +69,7 @@ func ConvertValuesResponseAPIWeather(weatherData *prevision.WeatherForecastsResp
 		Temp:       fmt.Sprintf("%.2f", weatherData.InfoMain.Temp),
 		TempMax:    fmt.Sprintf("%.2f", weatherData.InfoMain.TempMax),
 		TempMin:    fmt.Sprintf("%.2f", weatherData.InfoMain.TempMin),
-	}, nil
+	}
 }
 
 // GetCityValueByLabel obtém o valor correspondente ao rótulo do CityValues usando o mapa.
