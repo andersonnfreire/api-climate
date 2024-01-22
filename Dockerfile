@@ -8,9 +8,6 @@ COPY .env .
 # Copy the entire project (including the cmd directory)
 COPY . .
 
-# Copie a imagem para o diretório de trabalho (certifique-se de ajustar o caminho conforme necessário)
-COPY pkg/handlers/img/imagem.png /app
-
 RUN go mod tidy && go mod vendor
 
 # Compile the code in the cmd directory and generate the main executable
