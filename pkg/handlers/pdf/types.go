@@ -21,7 +21,6 @@ type CityValues struct {
 }
 
 type ConditionClimatic struct {
-	Name        string
 	Description string
 }
 
@@ -44,7 +43,6 @@ var CityValuesMap = map[string]func(*CityValues) string{
 	"Cidade":       func(c *CityValues) string { return utils.Utf8ToIso(c.City) },
 	"Latitude":     func(c *CityValues) string { return c.Latitude },
 	"Longitude":    func(c *CityValues) string { return c.Longitude },
-	"Céu":          func(c *CityValues) string { return utils.Utf8ToIso(c.ConditionClimatic.Name) },
 	"Precipitação": func(c *CityValues) string { return utils.Utf8ToIso(c.ConditionClimatic.Description) },
 	"Pressão":      func(c *CityValues) string { return c.Pressure },
 	"Umidade":      func(c *CityValues) string { return c.Humidity },
@@ -60,7 +58,6 @@ func ConvertValuesResponseAPIWeather(weatherData *prevision.WeatherForecastsResp
 		Latitude:  fmt.Sprintf("%.2f", weatherData.Coordinates.Lat),
 		Longitude: fmt.Sprintf("%.2f", weatherData.Coordinates.Lon),
 		ConditionClimatic: ConditionClimatic{
-			Name:        weatherData.ClimaticWeather[0].Main,
 			Description: weatherData.ClimaticWeather[0].Description,
 		},
 		Pressure:   fmt.Sprintf("%d", weatherData.InfoMain.Pressure),
