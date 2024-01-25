@@ -1,5 +1,11 @@
 package prevision
 
+type ParamsGetPrevision struct {
+	Token    string `validate:"required"`
+	Cidade   string `validate:"required"`
+	Language string
+}
+
 type WeatherForecastsResponse struct {
 	Coordinates     Coordinates `json:"coord"`
 	ClimaticWeather []Weather   `json:"weather"`
