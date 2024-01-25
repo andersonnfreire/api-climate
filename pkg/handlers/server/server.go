@@ -11,7 +11,7 @@ import (
 )
 
 // APIHandler manipula a requisição à API e gera o PDF.
-func APIHandler(writeResponse http.ResponseWriter, request *http.Request, cfg config.Config) {
+func ServerHandler(writeResponse http.ResponseWriter, request *http.Request, cfg config.Config) {
 	// Faça a requisição à API de previsão do tempo.
 	weatherData, err := prevision.GetPrevisionHandler(writeResponse, request, cfg)
 	if err != nil {

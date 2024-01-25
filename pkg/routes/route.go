@@ -9,6 +9,6 @@ import (
 
 func AddRoutes(mux *http.ServeMux, cfg config.Config) {
 	mux.HandleFunc("/search/weather/forecast", func(write http.ResponseWriter, request *http.Request) {
-		server.APIHandler(write, request, cfg)
+		server.ServerHandler(write, request, cfg)
 	})
 }

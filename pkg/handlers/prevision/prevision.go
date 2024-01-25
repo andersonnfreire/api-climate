@@ -16,8 +16,9 @@ var validate = validator.New()
 func GetPrevisionHandler(writerResponse http.ResponseWriter, request *http.Request, cfg config.Config) (*WeatherForecastsResponse, error) {
 
 	params := ParamsGetPrevision{
-		Token:  request.URL.Query().Get("token"),
-		Cidade: request.URL.Query().Get("cidade"),
+		Token:    request.URL.Query().Get("token"),
+		Cidade:   request.URL.Query().Get("cidade"),
+		Language: request.URL.Query().Get("lang"),
 	}
 
 	if err := validate.Struct(params); err != nil {
@@ -34,7 +35,7 @@ func GetPrevisionHandler(writerResponse http.ResponseWriter, request *http.Reque
 	}
 
 	if params.Cidade != "" {
-		options.QueryParams["cidade"] = params.Cidade
+		options.QueryParams["q"] = params.Cidade
 	}
 
 	if params.Language != "" {

@@ -21,7 +21,6 @@ type Coordinates struct {
 
 type Weather struct {
 	ID          int64  `json:"id"`
-	Main        string `json:"main"`
 	Description string `json:"description"`
 	Icon        string `json:"icon"`
 }
