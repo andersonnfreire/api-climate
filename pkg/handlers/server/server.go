@@ -6,11 +6,11 @@ import (
 
 	"github.com/andersonnfreire/api-climate/pkg/apis"
 	"github.com/andersonnfreire/api-climate/pkg/config"
-	"github.com/andersonnfreire/api-climate/pkg/handlers/pdf"
 	"github.com/andersonnfreire/api-climate/pkg/handlers/prevision"
+	"github.com/andersonnfreire/api-climate/pkg/handlers/template"
 )
 
-// APIHandler manipula a requisição à API e gera o PDF.
+// ServerHandler manipula a requisição à API e gera o HTML.
 func ServerHandler(writeResponse http.ResponseWriter, request *http.Request, cfg config.Config) {
 	// Faça a requisição à API de previsão do tempo.
 	weatherData, err := prevision.GetPrevisionHandler(writeResponse, request, cfg)
@@ -19,18 +19,12 @@ func ServerHandler(writeResponse http.ResponseWriter, request *http.Request, cfg
 		return
 	}
 
-	// Gere o PDF com base nos dados da previsão do tempo.
-	pdf, err := pdf.GeneratePDFHandler(weatherData)
+	// Gere o HTML com base nos dados da previsão do tempo.
+	_, err = template.RenderTemplateHTML(weatherData)
 	if err != nil {
-		apis.ResponseWithError(writeResponse, http.StatusInternalServerError, fmt.Sprintf("Erro ao gerar o PDF: %s", err.Error()))
+		apis.ResponseWithError(writeResponse, http.StatusInternalServerError, fmt.Sprintf("Erro ao gerar o HTML: %s", err.Error()))
 		return
 	}
 
-	// Configura o cabeçalho e envia o PDF como resposta
-	writeResponse.Header().Set("Content-Type", "application/pdf")
-	if err := pdf.Output(writeResponse); err != nil {
-		apis.ResponseWithError(writeResponse, http.StatusInternalServerError, fmt.Sprintf("Erro ao enviar o PDF: %s", err.Error()))
-		return
-	}
-	apis.Response(writeResponse, http.StatusOK, []byte("PDF gerado com sucesso!"))
+	apis.Response(writeResponse, http.StatusOK, []byte("HTML gerado com sucesso!"))
 }
