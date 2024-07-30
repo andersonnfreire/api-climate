@@ -2,7 +2,6 @@ package config
 
 import (
 	"fmt"
-	"log"
 	"net/http"
 	"os"
 
@@ -18,7 +17,7 @@ type Config struct {
 func Load() (*Config, error) {
 	err := godotenv.Load()
 	if err != nil {
-		log.Fatalf("Erro ao carregar o arquivo .env: %v", err)
+		// log.Fatalf("Erro ao carregar o arquivo .env: %v", err)
 	}
 
 	host := os.Getenv("HOST")

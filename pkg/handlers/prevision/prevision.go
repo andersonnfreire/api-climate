@@ -2,54 +2,55 @@ package prevision
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"time"
 
 	"github.com/andersonnfreire/api-climate/pkg/apis"
 	"github.com/andersonnfreire/api-climate/pkg/config"
-	"github.com/andersonnfreire/api-climate/pkg/handlers/validation"
+	"github.com/go-playground/validator"
 )
 
-func GetPrevisionHandler(writerResponse http.ResponseWriter, request *http.Request, cfg config.Config) {
+var validate = validator.New()
 
-	if err := validation.ValidateQueryParam(request); err != nil {
-		errorMsg := map[string]string{
-			"error": err.Error(),
-		}
-		response, err := json.Marshal(errorMsg)
-		if err != nil {
-			http.Error(writerResponse, "Erro interno do servidor", http.StatusInternalServerError)
-			return
-		}
-		writerResponse.Header().Set("Content-Type", "application/json")
-		writerResponse.WriteHeader(http.StatusUnprocessableEntity)
-		writerResponse.Write(response)
-		return
+func GetPrevisionHandler(writerResponse http.ResponseWriter, request *http.Request, cfg config.Config) (*WeatherForecastsResponse, error) {
+
+	params := ParamsGetPrevision{
+		Token:    request.URL.Query().Get("token"),
+		Cidade:   request.URL.Query().Get("cidade"),
+		Language: request.URL.Query().Get("lang"),
 	}
 
-	response, err := apis.SendHTTPRequest(apis.HTTPRequestOptions{
-		Method: "GET",
+	if err := validate.Struct(params); err != nil {
+		return nil, err
+	}
+
+	options := apis.HTTPRequestOptions{
+		Method: http.MethodGet,
 		URL:    "http://api.openweathermap.org/data/2.5/weather",
-		Headers: map[string]string{
-			"q":     request.URL.Query().Get("cidade"),
-			"appid": request.URL.Query().Get("token"),
+		QueryParams: map[string]string{
+			"appid": params.Token,
 		},
 		Timeout: 5 * time.Minute,
-	})
-
-	writerResponse.Header().Set("Content-Type", "application/json")
-	writerResponse.WriteHeader(response.StatusCode)
-
-	if err != nil {
-		errorMsg := map[string]string{
-			"error": err.Error(),
-		}
-		responseMsg, err := json.Marshal(errorMsg)
-		if err != nil {
-			http.Error(writerResponse, "Erro interno do servidor", http.StatusInternalServerError)
-			return
-		}
-		writerResponse.Write(responseMsg)
 	}
-	writerResponse.Write([]byte(response.Body))
+
+	if params.Cidade != "" {
+		options.QueryParams["q"] = params.Cidade
+	}
+
+	if params.Language != "" {
+		options.QueryParams["lang"] = params.Language
+	}
+
+	response, err := apis.SendHTTPRequest(options)
+	if err != nil {
+		return nil, err
+	}
+
+	var weatherData *WeatherForecastsResponse
+	if err := json.Unmarshal(response.Body, &weatherData); err != nil {
+		return nil, fmt.Errorf("erro ao decodificar dados da API: %s", err.Error())
+	}
+
+	return weatherData, nil
 }
